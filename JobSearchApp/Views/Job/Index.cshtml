@@ -1,0 +1,96 @@
+﻿@model IEnumerable<Job>
+
+@{
+    ViewData["Title"] = "Job Listings";
+    var description = ViewData["Description"] as string;
+    var location = ViewData["Location"] as string;
+    var pageNo = (int)ViewData["Page"];
+}
+
+<div class="container my-4">
+    <h1 class="mb-4">GitHub Jobs</h1>
+    <form id="search-form" class="mb-4">
+        <div class="form-row align-items-end">
+            <div class="form-group col">
+                <label for="description">Description</label>
+                <input type="text" class="form-control" id="description" name="description" value="@description">
+            </div>
+            <div class="form-group col">
+                <label for="location">Location</label>
+                <input type="text" class="form-control" id="location" name="location" value="@location">
+            </div>
+            <div class="form-group col-auto ml-2">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="full-time" name="full_time">
+                    <label class="form-check-label" for="full-time">Only Full Time</label>
+                </div>
+            </div>
+            <div class="form-group col-auto ml-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <div id="jobs">
+        @foreach (var job in Model)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">@job.Title - <span class="text-muted font-weight-light">@job.Company</span></h5>
+                            <h6 class="card-subtitle text-muted mb-2">@job.CreatedAt.ToShortDateString()</h6>
+                            <span class="badge badge-secondary mr-2">@job.Type</span>
+                            <span class="badge badge-secondary">@job.Location</span>
+                            <div style="word-break: break-all;">
+                                @Html.Raw(job.HowToApply)
+                            </div>
+                        </div>
+                        <img class="d-none d-md-block" height="50" src="@job.CompanyLogo" alt="@job.Company" />
+                    </div>
+                    <p class="card-text mt-3">
+                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse-@job.Id" aria-expanded="false" aria-controls="collapse-@job.Id">
+                            View Details
+                        </button>
+                    </p>
+                    <div class="collapse" id="collapse-@job.Id">
+                        <div class="card card-body">
+                            @Html.Raw(job.Description)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination (you can improve this logic to display pages dynamically) -->
+    <nav>
+        <ul class="pagination">
+            @if (pageNo > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?description=@description&location=@location&page=@(pageNo - 1)">Previous</a>
+                </li>
+            }
+            <li class="page-item active">
+                <span class="page-link">@pageNo</span>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?description=@description&location=@location&page=@(pageNo + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('search-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const description = document.getElementById('description').value;
+            const location = document.getElementById('location').value;
+            const fullTime = document.getElementById('full-time').checked;
+            const url = `/Job?description=${description}&location=${location}&full_time=${fullTime ? 'on' : ''}`;
+            window.location.href = url;
+        });
+    </script>
+}
