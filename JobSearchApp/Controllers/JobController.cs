@@ -1,6 +1,9 @@
 ﻿// Controllers/JobController.cs
 using Microsoft.AspNetCore.Mvc;
-using JobSearchApp.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace JobSearchApp.Controllers;
 
 public class JobController : Controller
 {
@@ -12,11 +15,12 @@ public class JobController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(string description, string location, int page = 1)
+    public async Task<IActionResult> Index(string description, string location, bool full_time = false, int page = 1)
     {
-        var jobs = await _jobService.GetJobsAsync(description, location);
+        var jobs = await _jobService.GetJobsAsync(description, location, full_time);
         ViewData["Description"] = description;
         ViewData["Location"] = location;
+        ViewData["FullTime"] = full_time;
         ViewData["Page"] = page;
         return View(jobs);
     }
